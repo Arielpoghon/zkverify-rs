@@ -12,7 +12,7 @@ A high-performance, command-line Groth16 zero-knowledge proof verifier for the B
 ### Build from Source
 
 ```bash
-git clone <repository>
+git clone https://github.com/Arielpoghon/zkverify-rs
 cd zkverify-rs
 cargo build --release
 ```
