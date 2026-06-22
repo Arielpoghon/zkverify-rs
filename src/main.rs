@@ -46,3 +46,4 @@ fn run(args: Args) -> Result<(), String> {
 
     Ok(())
 }
+// fixme: check bounds
