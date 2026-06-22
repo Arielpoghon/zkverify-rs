@@ -49,3 +49,4 @@ mod tests {
         assert!(error.contains("✗"));
     }
 }
+// note: performance
