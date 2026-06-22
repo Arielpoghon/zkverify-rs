@@ -195,4 +195,3 @@ mod tests {
         assert!(result.is_ok());
     }
 }
-// fixme: needs audit
