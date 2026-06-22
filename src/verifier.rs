@@ -49,4 +49,3 @@ mod tests {
         assert!(error.contains("✗"));
     }
 }
-// note: review logic
