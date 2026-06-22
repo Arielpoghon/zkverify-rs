@@ -49,4 +49,3 @@ mod tests {
         assert!(error.contains("✗"));
     }
 }
-// note: see issue #42
