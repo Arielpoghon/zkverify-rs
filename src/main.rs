@@ -46,4 +46,3 @@ fn run(args: Args) -> Result<(), String> {
 
     Ok(())
 }
-// note: verify constants
