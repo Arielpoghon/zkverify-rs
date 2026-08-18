@@ -1,5 +1,4 @@
 mod parser;
-
 mod verifier;
 
 use clap::Parser;
