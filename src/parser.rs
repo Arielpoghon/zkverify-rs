@@ -289,4 +289,79 @@ mod tests {
         ];
         assert!(parse_g2(&coords).is_ok());
     }
+
+    #[test]
+    fn test_load_proof_missing_file() {
+        let result = load_proof("nonexistent.json");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("Failed to read"));
+    }
+
+    #[test]
+    fn test_load_proof_invalid_json() {
+        let dir = std::env::temp_dir().join("zkverify_test_invalid_proof");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("proof.json");
+        std::fs::write(&path, "not json").unwrap();
+
+        let result = load_proof(path.to_str().unwrap());
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("parse proof JSON"));
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn test_load_proof_wrong_protocol() {
+        let dir = std::env::temp_dir().join("zkverify_test_wrong_proto");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("proof.json");
+        let json = r#"{"pi_a":["1","2","1"],"pi_b":[["1","2"],["3","4"],["1","0"]],"pi_c":["1","2","1"],"protocol":"plonk","curve":"bn254"}"#;
+        std::fs::write(&path, json).unwrap();
+
+        let result = load_proof(path.to_str().unwrap());
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("groth16"));
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn test_load_vkey_missing_file() {
+        let result = load_vkey("nonexistent.json");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_load_public_missing_file() {
+        let result = load_public("nonexistent.json");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_load_public_invalid_json() {
+        let dir = std::env::temp_dir().join("zkverify_test_invalid_pub");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("public.json");
+        std::fs::write(&path, "not json").unwrap();
+
+        let result = load_public(path.to_str().unwrap());
+        assert!(result.is_err());
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn test_load_public_valid() {
+        let dir = std::env::temp_dir().join("zkverify_test_valid_pub");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("public.json");
+        std::fs::write(&path, r#"["42","100"]"#).unwrap();
+
+        let result = load_public(path.to_str().unwrap());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().len(), 2);
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
 }
