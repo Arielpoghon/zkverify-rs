@@ -205,4 +205,24 @@ mod tests {
         let result = parse_fr(fr_str);
         assert!(result.is_ok());
     }
+
+    #[test]
+    fn test_parse_fq_valid() {
+        assert!(parse_fq("0").is_ok());
+        assert!(parse_fq("1").is_ok());
+        assert!(parse_fq("42").is_ok());
+    }
+
+    #[test]
+    fn test_parse_fq_large_value() {
+        // A large but valid field element
+        let result = parse_fq("21888242871839275222246405745257275088548364400416034343698204186575808495616");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_parse_fq_invalid() {
+        assert!(parse_fq("not_a_number").is_err());
+        assert!(parse_fq("").is_err());
+    }
 }
