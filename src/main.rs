@@ -1,3 +1,8 @@
+//! CLI entry point for the Groth16 zero-knowledge proof verifier.
+//!
+//! Provides a command-line interface to verify Groth16 proofs
+//! against verification keys and public inputs in snarkjs JSON format.
+
 mod parser;
 mod verifier;
 
