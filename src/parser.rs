@@ -246,4 +246,47 @@ mod tests {
         let result = parse_g1(&coords);
         assert!(result.is_ok());
     }
+
+    #[test]
+    fn test_parse_g2_valid() {
+        let coords = vec![
+            vec!["1".to_string(), "2".to_string()],
+            vec!["3".to_string(), "4".to_string()],
+            vec!["1".to_string(), "0".to_string()],
+        ];
+        assert!(parse_g2(&coords).is_ok());
+    }
+
+    #[test]
+    fn test_parse_g2_wrong_outer_length() {
+        let coords = vec![
+            vec!["1".to_string(), "2".to_string()],
+            vec!["3".to_string(), "4".to_string()],
+        ];
+        let result = parse_g2(&coords);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("3 elements"));
+    }
+
+    #[test]
+    fn test_parse_g2_wrong_inner_length() {
+        let coords = vec![
+            vec!["1".to_string()],
+            vec!["3".to_string(), "4".to_string()],
+            vec!["1".to_string(), "0".to_string()],
+        ];
+        let result = parse_g2(&coords);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("2 elements"));
+    }
+
+    #[test]
+    fn test_parse_g2_point_at_infinity() {
+        let coords = vec![
+            vec!["0".to_string(), "0".to_string()],
+            vec!["0".to_string(), "0".to_string()],
+            vec!["0".to_string(), "0".to_string()],
+        ];
+        assert!(parse_g2(&coords).is_ok());
+    }
 }
