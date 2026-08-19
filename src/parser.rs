@@ -225,4 +225,25 @@ mod tests {
         assert!(parse_fq("not_a_number").is_err());
         assert!(parse_fq("").is_err());
     }
+
+    #[test]
+    fn test_parse_g1_valid() {
+        let coords = vec!["1".to_string(), "2".to_string(), "1".to_string()];
+        assert!(parse_g1(&coords).is_ok());
+    }
+
+    #[test]
+    fn test_parse_g1_wrong_length() {
+        let coords = vec!["1".to_string(), "2".to_string()];
+        let result = parse_g1(&coords);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("3 elements"));
+    }
+
+    #[test]
+    fn test_parse_g1_point_at_infinity() {
+        let coords = vec!["0".to_string(), "0".to_string(), "0".to_string()];
+        let result = parse_g1(&coords);
+        assert!(result.is_ok());
+    }
 }
