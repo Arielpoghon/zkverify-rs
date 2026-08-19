@@ -52,6 +52,17 @@ Add to your `Cargo.toml`:
 zkverify-rs = { path = "./zkverify-rs" }
 ```
 
+Then use it in your code:
+
+```rust
+use zkverify_rs::{parser, verifier};
+
+let vkey = parser::load_vkey("vkey.json")?;
+let proof = parser::load_proof("proof.json")?;
+let public = parser::load_public("public.json")?;
+verifier::verify_proof(&vkey, &proof, &public)?;
+```
+
 ## File Format
 
 ### Proof Format (snarkjs-compatible)
@@ -119,8 +130,10 @@ Where:
 
 ## Architecture
 
+- **`src/lib.rs`** - Library entry point, re-exports public API
 - **`src/parser.rs`** - JSON parsing and snarkjs format conversion
 - **`src/verifier.rs`** - Core Groth16 verification logic
+- **`src/error.rs`** - Structured error types with `thiserror`
 - **`src/main.rs`** - CLI interface using `clap`
 - **`src/bin/generate_test_proof.rs`** - Test proof generation
 
@@ -133,6 +146,7 @@ Where:
 - `serde`, `serde_json` - JSON serialization
 - `clap` - CLI argument parsing
 - `rand` - Random number generation
+- `thiserror` - Structured error types
 
 ## Examples
 
