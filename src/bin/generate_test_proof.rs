@@ -1,3 +1,9 @@
+//! Test proof generator for development and testing.
+//!
+//! Generates a simple Groth16 proof for the `a * b = c` circuit
+//! with concrete values (a=3, b=5, c=15) and writes snarkjs-compatible
+//! JSON files to the `examples/` directory.
+
 use ark_bn254::{Bn254, Fr};
 use ark_groth16::Groth16;
 use ark_relations::r1cs::{ConstraintSynthesizer, SynthesisError, LinearCombination};
