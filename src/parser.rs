@@ -1,3 +1,14 @@
+//! JSON parsing and snarkjs format conversion for Groth16 proofs.
+//!
+//! This module handles loading and converting snarkjs-compatible JSON files
+//! into arkworks-native types for the BN254 curve. It supports:
+//! - Parsing verification keys (`vkey.json`)
+//! - Parsing proofs (`proof.json`)
+//! - Parsing public inputs (`public.json`)
+//!
+//! All coordinate conversions handle projective-to-affine transformation
+//! and correctly identify points at infinity.
+
 use ark_bn254::{Fr, Fq, G1Affine, G2Affine, Bn254};
 use ark_groth16::{Proof, VerifyingKey};
 use ark_ff::Zero;
