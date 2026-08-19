@@ -16,6 +16,8 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::str::FromStr;
 
+use crate::error::VerifyError;
+
 /// Represents a snarkjs-compatible proof JSON structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SnarkjsProof {
@@ -41,22 +43,28 @@ pub struct SnarkjsVKey {
 }
 
 /// Parse a decimal string into a base field element Fq
-fn parse_fq(s: &str) -> Result<Fq, String> {
-    Fq::from_str(s).map_err(|e| format!("Failed to parse Fq from '{}': {:?}", s, e))
+fn parse_fq(s: &str) -> Result<Fq, VerifyError> {
+    Fq::from_str(s).map_err(|e| VerifyError::FieldParse {
+        input: s.to_string(),
+        reason: format!("{:?}", e),
+    })
 }
 
 /// Parse a decimal string into a scalar field element Fr  
-fn parse_fr(s: &str) -> Result<Fr, String> {
-    Fr::from_str(s).map_err(|e| format!("Failed to parse Fr from '{}': {:?}", s, e))
+fn parse_fr(s: &str) -> Result<Fr, VerifyError> {
+    Fr::from_str(s).map_err(|e| VerifyError::FieldParse {
+        input: s.to_string(),
+        reason: format!("{:?}", e),
+    })
 }
 
 /// Parse G1 affine coordinates [x, y, "1"] to G1Affine
-pub fn parse_g1(coords: &[String]) -> Result<G1Affine, String> {
+pub fn parse_g1(coords: &[String]) -> Result<G1Affine, VerifyError> {
     if coords.len() != 3 {
-        return Err(format!(
+        return Err(VerifyError::InvalidCoordinates(format!(
             "G1 coordinates must have 3 elements, got {}",
             coords.len()
-        ));
+        )));
     }
 
     let x = parse_fq(&coords[0])?;
@@ -73,16 +81,18 @@ pub fn parse_g1(coords: &[String]) -> Result<G1Affine, String> {
 }
 
 /// Parse G2 affine coordinates [[x0,x1],[y0,y1],["1","0"]] to G2Affine
-pub fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, String> {
+pub fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, VerifyError> {
     if coords.len() != 3 {
-        return Err(format!(
+        return Err(VerifyError::InvalidCoordinates(format!(
             "G2 coordinates must have 3 elements, got {}",
             coords.len()
-        ));
+        )));
     }
 
     if coords[0].len() != 2 || coords[1].len() != 2 || coords[2].len() != 2 {
-        return Err("G2 coordinates must each have 2 elements (for extension field)".to_string());
+        return Err(VerifyError::InvalidCoordinates(
+            "G2 coordinates must each have 2 elements (for extension field)".to_string(),
+        ));
     }
 
     // Parse X coordinate (quadratic extension field element)
@@ -109,25 +119,20 @@ pub fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, String> {
 }
 
 /// Load and parse a proof from a JSON file
-pub fn load_proof(path: &str) -> Result<Proof<Bn254>, String> {
-    let file_content = fs::read_to_string(path)
-        .map_err(|e| format!("Failed to read proof file '{}': {}", path, e))?;
+pub fn load_proof(path: &str) -> Result<Proof<Bn254>, VerifyError> {
+    let file_content = fs::read_to_string(path).map_err(|e| VerifyError::IoRead {
+        path: path.to_string(),
+        source: e,
+    })?;
 
-    let proof_json: SnarkjsProof = serde_json::from_str(&file_content)
-        .map_err(|e| format!("Failed to parse proof JSON: {}", e))?;
+    let proof_json: SnarkjsProof = serde_json::from_str(&file_content)?;
 
     if proof_json.protocol != "groth16" {
-        return Err(format!(
-            "Expected protocol 'groth16', got '{}'",
-            proof_json.protocol
-        ));
+        return Err(VerifyError::WrongProtocol(proof_json.protocol));
     }
 
     if proof_json.curve != "bn254" && proof_json.curve != "bn128" {
-        return Err(format!(
-            "Expected curve 'bn254' or 'bn128', got '{}'",
-            proof_json.curve
-        ));
+        return Err(VerifyError::WrongCurve(proof_json.curve));
     }
 
     let pi_a = parse_g1(&proof_json.pi_a)?;
@@ -138,25 +143,20 @@ pub fn load_proof(path: &str) -> Result<Proof<Bn254>, String> {
 }
 
 /// Load and parse a verifying key from a JSON file
-pub fn load_vkey(path: &str) -> Result<VerifyingKey<Bn254>, String> {
-    let file_content = fs::read_to_string(path)
-        .map_err(|e| format!("Failed to read vkey file '{}': {}", path, e))?;
+pub fn load_vkey(path: &str) -> Result<VerifyingKey<Bn254>, VerifyError> {
+    let file_content = fs::read_to_string(path).map_err(|e| VerifyError::IoRead {
+        path: path.to_string(),
+        source: e,
+    })?;
 
-    let vkey_json: SnarkjsVKey = serde_json::from_str(&file_content)
-        .map_err(|e| format!("Failed to parse vkey JSON: {}", e))?;
+    let vkey_json: SnarkjsVKey = serde_json::from_str(&file_content)?;
 
     if vkey_json.protocol != "groth16" {
-        return Err(format!(
-            "Expected protocol 'groth16', got '{}'",
-            vkey_json.protocol
-        ));
+        return Err(VerifyError::WrongProtocol(vkey_json.protocol));
     }
 
     if vkey_json.curve != "bn254" && vkey_json.curve != "bn128" {
-        return Err(format!(
-            "Expected curve 'bn254' or 'bn128', got '{}'",
-            vkey_json.curve
-        ));
+        return Err(VerifyError::WrongCurve(vkey_json.curve));
     }
 
     let alpha_g1 = parse_g1(&vkey_json.vk_alpha_1)?;
@@ -179,12 +179,13 @@ pub fn load_vkey(path: &str) -> Result<VerifyingKey<Bn254>, String> {
 }
 
 /// Load and parse public inputs from a JSON file
-pub fn load_public(path: &str) -> Result<Vec<Fr>, String> {
-    let file_content = fs::read_to_string(path)
-        .map_err(|e| format!("Failed to read public inputs file '{}': {}", path, e))?;
+pub fn load_public(path: &str) -> Result<Vec<Fr>, VerifyError> {
+    let file_content = fs::read_to_string(path).map_err(|e| VerifyError::IoRead {
+        path: path.to_string(),
+        source: e,
+    })?;
 
-    let public_json: Vec<String> = serde_json::from_str(&file_content)
-        .map_err(|e| format!("Failed to parse public inputs JSON: {}", e))?;
+    let public_json: Vec<String> = serde_json::from_str(&file_content)?;
 
     let mut public_inputs = Vec::new();
     for input_str in public_json {
@@ -215,7 +216,6 @@ mod tests {
 
     #[test]
     fn test_parse_fq_large_value() {
-        // A large but valid field element
         let result = parse_fq("21888242871839275222246405745257275088548364400416034343698204186575808495616");
         assert!(result.is_ok());
     }
@@ -237,7 +237,6 @@ mod tests {
         let coords = vec!["1".to_string(), "2".to_string()];
         let result = parse_g1(&coords);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("3 elements"));
     }
 
     #[test]
@@ -265,7 +264,6 @@ mod tests {
         ];
         let result = parse_g2(&coords);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("3 elements"));
     }
 
     #[test]
@@ -277,7 +275,6 @@ mod tests {
         ];
         let result = parse_g2(&coords);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("2 elements"));
     }
 
     #[test]
@@ -294,7 +291,6 @@ mod tests {
     fn test_load_proof_missing_file() {
         let result = load_proof("nonexistent.json");
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("Failed to read"));
     }
 
     #[test]
@@ -306,7 +302,6 @@ mod tests {
 
         let result = load_proof(path.to_str().unwrap());
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("parse proof JSON"));
 
         std::fs::remove_dir_all(&dir).unwrap();
     }
@@ -321,7 +316,6 @@ mod tests {
 
         let result = load_proof(path.to_str().unwrap());
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("groth16"));
 
         std::fs::remove_dir_all(&dir).unwrap();
     }

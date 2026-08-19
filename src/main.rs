@@ -9,6 +9,8 @@ mod verifier;
 use clap::Parser;
 use std::process;
 
+use zkverify_rs::error::VerifyError;
+
 /// Groth16 Zero-Knowledge Proof Verifier for BN254
 #[derive(Parser, Debug)]
 #[command(name = "zkverify-rs")]
@@ -36,17 +38,10 @@ fn main() {
     }
 }
 
-fn run(args: Args) -> Result<(), String> {
-    // Load verification key
+fn run(args: Args) -> Result<(), VerifyError> {
     let vk = parser::load_vkey(&args.vkey)?;
-
-    // Load proof
     let proof = parser::load_proof(&args.proof)?;
-
-    // Load public inputs
     let public_inputs = parser::load_public(&args.inputs)?;
-
-    // Verify the proof
     verifier::verify_and_report(&vk, &proof, &public_inputs)?;
 
     Ok(())
