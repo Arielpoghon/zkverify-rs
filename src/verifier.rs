@@ -1,3 +1,9 @@
+//! Core Groth16 proof verification logic for BN254.
+//!
+//! This module provides functions to verify Groth16 zero-knowledge proofs
+//! using the arkworks library. It wraps the arkworks verification API
+//! with user-friendly result reporting.
+
 use ark_bn254::{Bn254, Fr};
 use ark_groth16::{Groth16, Proof, VerifyingKey, PreparedVerifyingKey};
 
