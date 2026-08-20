@@ -402,4 +402,18 @@ mod tests {
 
         std::fs::remove_dir_all(&dir).unwrap();
     }
+
+    #[test]
+    fn test_load_public_empty_array() {
+        let dir = std::env::temp_dir().join("zkverify_test_empty_pub");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("public.json");
+        std::fs::write(&path, r#"[]"#).unwrap();
+
+        let result = load_public(path.to_str().unwrap());
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().len(), 0);
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
 }
