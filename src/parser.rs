@@ -416,4 +416,17 @@ mod tests {
 
         std::fs::remove_dir_all(&dir).unwrap();
     }
+
+    #[test]
+    fn test_load_public_non_numeric() {
+        let dir = std::env::temp_dir().join("zkverify_test_non_numeric_pub");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("public.json");
+        std::fs::write(&path, r#"["not_a_number"]"#).unwrap();
+
+        let result = load_public(path.to_str().unwrap());
+        assert!(result.is_err());
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
 }
