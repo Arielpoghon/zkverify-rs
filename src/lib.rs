@@ -32,6 +32,15 @@ use crate::error::VerifyError;
 ///
 /// Returns [`VerifyError`] if any file cannot be read, parsed, or
 /// if the proof is invalid.
+///
+/// # Example
+///
+/// ```no_run
+/// use zkverify_rs::verify_from_files;
+///
+/// verify_from_files("vkey.json", "proof.json", "public.json")
+///     .expect("proof verification failed");
+/// ```
 pub fn verify_from_files(
     vkey_path: &str,
     proof_path: &str,
