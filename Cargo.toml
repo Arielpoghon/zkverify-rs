@@ -2,6 +2,11 @@
 name = "zkverify-rs"
 version = "0.1.0"
 edition = "2021"
+description = "A high-performance Groth16 zero-knowledge proof verifier for BN254"
+license = "MIT"
+repository = "https://github.com/Arielpoghon/zkverify-rs"
+keywords = ["zkp", "zero-knowledge", "groth16", "bn254", "verification"]
+categories = ["cryptography", "command-line-utilities"]
 
 [lib]
 name = "zkverify_rs"
