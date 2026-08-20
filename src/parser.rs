@@ -59,7 +59,7 @@ fn parse_fr(s: &str) -> Result<Fr, VerifyError> {
 }
 
 /// Parse G1 affine coordinates [x, y, "1"] to G1Affine
-pub fn parse_g1(coords: &[String]) -> Result<G1Affine, VerifyError> {
+pub(crate) fn parse_g1(coords: &[String]) -> Result<G1Affine, VerifyError> {
     if coords.len() != 3 {
         return Err(VerifyError::InvalidCoordinates(format!(
             "G1 coordinates must have 3 elements, got {}",
@@ -81,7 +81,7 @@ pub fn parse_g1(coords: &[String]) -> Result<G1Affine, VerifyError> {
 }
 
 /// Parse G2 affine coordinates [[x0,x1],[y0,y1],["1","0"]] to G2Affine
-pub fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, VerifyError> {
+pub(crate) fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, VerifyError> {
     if coords.len() != 3 {
         return Err(VerifyError::InvalidCoordinates(format!(
             "G2 coordinates must have 3 elements, got {}",
