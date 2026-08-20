@@ -35,3 +35,29 @@ fn test_wrong_public_inputs_fail_verification() {
 
     std::fs::remove_dir_all(&dir).unwrap();
 }
+
+#[test]
+fn test_round_trip_generate_and_verify() {
+    use std::process::Command;
+
+    // Generate fresh proof files
+    let gen_output = Command::new("cargo")
+        .args(["run", "--bin", "generate_test_proof", "--release"])
+        .current_dir(env!("CARGO_MANIFEST_DIR"))
+        .output()
+        .expect("failed to run generate_test_proof");
+
+    assert!(
+        gen_output.status.success(),
+        "generate_test_proof failed: {}",
+        String::from_utf8_lossy(&gen_output.stderr)
+    );
+
+    // Verify the freshly generated proof
+    let vkey = parser::load_vkey("examples/vkey.json").unwrap();
+    let proof = parser::load_proof("examples/proof.json").unwrap();
+    let public = parser::load_public("examples/public.json").unwrap();
+
+    let result = verifier::verify_proof(&vkey, &proof, &public);
+    assert!(result.is_ok(), "round-trip verification failed: {:?}", result.err());
+}
