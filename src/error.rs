@@ -2,8 +2,6 @@
 //!
 //! Provides structured error handling instead of raw `String` errors.
 
-use std::fmt;
-
 /// Errors that can occur during proof verification.
 #[derive(Debug, thiserror::Error)]
 pub enum VerifyError {
@@ -11,6 +9,7 @@ pub enum VerifyError {
     #[error("failed to read file '{path}': {source}")]
     IoRead {
         path: String,
+        #[source]
         source: std::io::Error,
     },
 
