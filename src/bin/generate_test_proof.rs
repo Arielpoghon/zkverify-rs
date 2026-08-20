@@ -10,6 +10,12 @@ use ark_relations::r1cs::{ConstraintSynthesizer, SynthesisError, LinearCombinati
 use ark_snark::SNARK;
 use rand::thread_rng;
 use std::fs;
+
+/// A simple multiplication circuit that enforces `a * b = c`.
+///
+/// Used for testing Groth16 proof generation and verification.
+/// When witnesses are `None`, the circuit is used for setup;
+/// when `Some`, it produces a concrete proof.
 struct MulCircuit {
     a: Option<Fr>,
     b: Option<Fr>,
