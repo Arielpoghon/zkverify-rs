@@ -324,6 +324,20 @@ mod tests {
     }
 
     #[test]
+    fn test_load_proof_wrong_curve() {
+        let dir = std::env::temp_dir().join("zkverify_test_wrong_curve");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("proof.json");
+        let json = r#"{"pi_a":["1","2","1"],"pi_b":[["1","2"],["3","4"],["1","0"]],"pi_c":["1","2","1"],"protocol":"groth16","curve":"bls12381"}"#;
+        std::fs::write(&path, json).unwrap();
+
+        let result = load_proof(path.to_str().unwrap());
+        assert!(result.is_err());
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
     fn test_load_vkey_missing_file() {
         let result = load_vkey("nonexistent.json");
         assert!(result.is_err());
