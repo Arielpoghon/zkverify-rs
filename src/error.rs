@@ -42,3 +42,26 @@ pub enum VerifyError {
     #[error("{0}")]
     Other(String),
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_error_display() {
+        let err = VerifyError::InvalidProof;
+        assert_eq!(format!("{}", err), "proof verification failed");
+
+        let err = VerifyError::WrongProtocol("plonk".to_string());
+        assert!(format!("{}", err).contains("plonk"));
+
+        let err = VerifyError::WrongCurve("bls12381".to_string());
+        assert!(format!("{}", err).contains("bls12381"));
+
+        let err = VerifyError::FieldParse {
+            input: "abc".to_string(),
+            reason: "invalid".to_string(),
+        };
+        assert!(format!("{}", err).contains("abc"));
+    }
+}
