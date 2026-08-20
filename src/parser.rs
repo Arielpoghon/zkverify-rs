@@ -344,6 +344,19 @@ mod tests {
     }
 
     #[test]
+    fn test_load_vkey_invalid_json() {
+        let dir = std::env::temp_dir().join("zkverify_test_invalid_vkey");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("vkey.json");
+        std::fs::write(&path, "not json at all").unwrap();
+
+        let result = load_vkey(path.to_str().unwrap());
+        assert!(result.is_err());
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
     fn test_load_public_missing_file() {
         let result = load_public("nonexistent.json");
         assert!(result.is_err());
