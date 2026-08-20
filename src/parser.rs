@@ -357,6 +357,20 @@ mod tests {
     }
 
     #[test]
+    fn test_load_vkey_wrong_protocol() {
+        let dir = std::env::temp_dir().join("zkverify_test_vkey_wrong_proto");
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("vkey.json");
+        let json = r#"{"protocol":"plonk","curve":"bn254","nPublic":1,"vk_alpha_1":["1","2","1"],"vk_beta_2":[["1","2"],["3","4"],["1","0"]],"vk_gamma_2":[["1","2"],["3","4"],["1","0"]],"vk_delta_2":[["1","2"],["3","4"],["1","0"]],"ic":[["1","2","1"]]}"#;
+        std::fs::write(&path, json).unwrap();
+
+        let result = load_vkey(path.to_str().unwrap());
+        assert!(result.is_err());
+
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
     fn test_load_public_missing_file() {
         let result = load_public("nonexistent.json");
         assert!(result.is_err());
