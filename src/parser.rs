@@ -119,6 +119,7 @@ pub(crate) fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, VerifyError> 
 }
 
 /// Load and parse a proof from a JSON file
+#[must_use = "the loaded proof should be used for verification"]
 pub fn load_proof(path: &str) -> Result<Proof<Bn254>, VerifyError> {
     let file_content = fs::read_to_string(path).map_err(|e| VerifyError::IoRead {
         path: path.to_string(),
@@ -143,6 +144,7 @@ pub fn load_proof(path: &str) -> Result<Proof<Bn254>, VerifyError> {
 }
 
 /// Load and parse a verifying key from a JSON file
+#[must_use = "the loaded verifying key should be used for verification"]
 pub fn load_vkey(path: &str) -> Result<VerifyingKey<Bn254>, VerifyError> {
     let file_content = fs::read_to_string(path).map_err(|e| VerifyError::IoRead {
         path: path.to_string(),
@@ -179,6 +181,7 @@ pub fn load_vkey(path: &str) -> Result<VerifyingKey<Bn254>, VerifyError> {
 }
 
 /// Load and parse public inputs from a JSON file
+#[must_use = "the loaded public inputs should be used for verification"]
 pub fn load_public(path: &str) -> Result<Vec<Fr>, VerifyError> {
     let file_content = fs::read_to_string(path).map_err(|e| VerifyError::IoRead {
         path: path.to_string(),
