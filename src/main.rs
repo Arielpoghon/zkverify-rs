@@ -13,7 +13,7 @@ use zkverify_rs::error::VerifyError;
 
 /// Groth16 Zero-Knowledge Proof Verifier for BN254
 #[derive(Parser, Debug)]
-#[command(name = "zkverify-rs")]
+#[command(name = "zkverify-rs", version)]
 #[command(about = "A command-line Groth16 proof verifier for BN254", long_about = None)]
 struct Args {
     /// Path to the verification key (vkey.json)
