@@ -4,6 +4,18 @@
 //!
 //! This crate provides tools for verifying Groth16 proofs in
 //! snarkjs-compatible JSON format using the arkworks cryptography library.
+//!
+//! # Quick Start
+//!
+//! ```no_run
+//! use zkverify_rs::verify_from_files;
+//!
+//! fn main() -> Result<(), zkverify_rs::error::VerifyError> {
+//!     verify_from_files("vkey.json", "proof.json", "public.json")?;
+//!     println!("Proof is valid!");
+//!     Ok(())
+//! }
+//! ```
 
 pub mod error;
 pub mod parser;
