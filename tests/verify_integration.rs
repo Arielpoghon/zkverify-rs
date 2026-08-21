@@ -95,3 +95,30 @@ fn test_tampered_proof_fails_verification() {
 
     std::fs::remove_dir_all(&dir).unwrap();
 }
+
+#[test]
+fn test_verify_and_report_success() {
+    let vkey = parser::load_vkey("examples/vkey.json").unwrap();
+    let proof = parser::load_proof("examples/proof.json").unwrap();
+    let public = parser::load_public("examples/public.json").unwrap();
+
+    let result = verifier::verify_and_report(&vkey, &proof, &public);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_verify_and_report_failure() {
+    let vkey = parser::load_vkey("examples/vkey.json").unwrap();
+    let proof = parser::load_proof("examples/proof.json").unwrap();
+
+    let dir = std::env::temp_dir().join("zkverify_report_fail");
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("public.json");
+    std::fs::write(&path, r#"["1"]"#).unwrap();
+    let wrong_public = parser::load_public(path.to_str().unwrap()).unwrap();
+
+    let result = verifier::verify_and_report(&vkey, &proof, &wrong_public);
+    assert!(result.is_err());
+
+    std::fs::remove_dir_all(&dir).unwrap();
+}
