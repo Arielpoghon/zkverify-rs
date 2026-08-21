@@ -14,6 +14,7 @@ use ark_groth16::{Proof, VerifyingKey};
 use ark_ff::Zero;
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::io::Read;
 use std::str::FromStr;
 
 use crate::error::VerifyError;
@@ -141,6 +142,36 @@ pub fn load_proof(path: &str) -> Result<Proof<Bn254>, VerifyError> {
     let pi_c = parse_g1(&proof_json.pi_c)?;
 
     Ok(Proof { a: pi_a, b: pi_b, c: pi_c })
+}
+
+/// Load and parse a proof from any reader
+pub fn load_proof_from_reader<R: Read>(reader: &mut R) -> Result<Proof<Bn254>, VerifyError> {
+    let mut content = String::new();
+    reader.read_to_string(&mut content).map_err(|e| VerifyError::IoRead {
+        path: "<reader>".to_string(),
+        source: e,
+    })?;
+    parse_proof_json(&content)
+}
+
+/// Load and parse a verifying key from any reader
+pub fn load_vkey_from_reader<R: Read>(reader: &mut R) -> Result<VerifyingKey<Bn254>, VerifyError> {
+    let mut content = String::new();
+    reader.read_to_string(&mut content).map_err(|e| VerifyError::IoRead {
+        path: "<reader>".to_string(),
+        source: e,
+    })?;
+    parse_vkey_json(&content)
+}
+
+/// Load and parse public inputs from any reader
+pub fn load_public_from_reader<R: Read>(reader: &mut R) -> Result<Vec<Fr>, VerifyError> {
+    let mut content = String::new();
+    reader.read_to_string(&mut content).map_err(|e| VerifyError::IoRead {
+        path: "<reader>".to_string(),
+        source: e,
+    })?;
+    parse_public_json(&content)
 }
 
 /// Load and parse a verifying key from a JSON file
