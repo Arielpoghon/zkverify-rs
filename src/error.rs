@@ -63,4 +63,16 @@ mod tests {
         };
         assert!(format!("{}", err).contains("abc"));
     }
+
+    #[test]
+    fn test_io_read_error_source_chain() {
+        let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, "file missing");
+        let err = VerifyError::IoRead {
+            path: "/tmp/test.json".to_string(),
+            source: io_err,
+        };
+
+        assert!(std::error::Error::source(&err).is_some());
+        assert!(format!("{}", err).contains("/tmp/test.json"));
+    }
 }
