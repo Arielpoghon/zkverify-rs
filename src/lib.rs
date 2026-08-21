@@ -51,3 +51,23 @@ pub fn verify_from_files(
     let public = parser::load_public(public_path)?;
     verifier::verify_proof(&vk, &proof, &public)
 }
+
+/// Verify a proof directly from JSON strings.
+///
+/// Parses the verification key, proof, and public inputs from
+/// raw JSON strings and verifies the proof.
+///
+/// # Errors
+///
+/// Returns [`VerifyError`] if any JSON is malformed or
+/// if the proof is invalid.
+pub fn verify_from_str(
+    vkey_json: &str,
+    proof_json: &str,
+    public_json: &str,
+) -> Result<(), VerifyError> {
+    let vk = parser::parse_vkey_json(vkey_json)?;
+    let proof = parser::parse_proof_json(proof_json)?;
+    let public = parser::parse_public_json(public_json)?;
+    verifier::verify_proof(&vk, &proof, &public)
+}

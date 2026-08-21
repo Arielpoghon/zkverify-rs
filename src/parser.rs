@@ -188,7 +188,62 @@ pub fn load_public(path: &str) -> Result<Vec<Fr>, VerifyError> {
         source: e,
     })?;
 
-    let public_json: Vec<String> = serde_json::from_str(&file_content)?;
+    parse_public_json(&file_content)
+}
+
+/// Parse a proof from a JSON string
+pub fn parse_proof_json(json: &str) -> Result<Proof<Bn254>, VerifyError> {
+    let proof_json: SnarkjsProof = serde_json::from_str(json)?;
+
+    if proof_json.protocol != "groth16" {
+        return Err(VerifyError::WrongProtocol(proof_json.protocol));
+    }
+
+    if proof_json.curve != "bn254" && proof_json.curve != "bn128" {
+        return Err(VerifyError::WrongCurve(proof_json.curve));
+    }
+
+    let pi_a = parse_g1(&proof_json.pi_a)?;
+    let pi_b = parse_g2(&proof_json.pi_b)?;
+    let pi_c = parse_g1(&proof_json.pi_c)?;
+
+    Ok(Proof { a: pi_a, b: pi_b, c: pi_c })
+}
+
+/// Parse a verifying key from a JSON string
+pub fn parse_vkey_json(json: &str) -> Result<VerifyingKey<Bn254>, VerifyError> {
+    let vkey_json: SnarkjsVKey = serde_json::from_str(json)?;
+
+    if vkey_json.protocol != "groth16" {
+        return Err(VerifyError::WrongProtocol(vkey_json.protocol));
+    }
+
+    if vkey_json.curve != "bn254" && vkey_json.curve != "bn128" {
+        return Err(VerifyError::WrongCurve(vkey_json.curve));
+    }
+
+    let alpha_g1 = parse_g1(&vkey_json.vk_alpha_1)?;
+    let beta_g2 = parse_g2(&vkey_json.vk_beta_2)?;
+    let gamma_g2 = parse_g2(&vkey_json.vk_gamma_2)?;
+    let delta_g2 = parse_g2(&vkey_json.vk_delta_2)?;
+
+    let mut gamma_abc_g1 = Vec::new();
+    for ic_coords in &vkey_json.ic {
+        gamma_abc_g1.push(parse_g1(ic_coords)?);
+    }
+
+    Ok(VerifyingKey {
+        alpha_g1,
+        beta_g2,
+        gamma_g2,
+        delta_g2,
+        gamma_abc_g1,
+    })
+}
+
+/// Parse public inputs from a JSON string
+pub fn parse_public_json(json: &str) -> Result<Vec<Fr>, VerifyError> {
+    let public_json: Vec<String> = serde_json::from_str(json)?;
 
     let mut public_inputs = Vec::new();
     for input_str in public_json {
