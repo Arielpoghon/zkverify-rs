@@ -53,6 +53,14 @@ pub fn verify_and_report(
     Ok(())
 }
 
+/// Return the number of public inputs in a proof's verification context.
+///
+/// This is the length of the `gamma_abc_g1` vector in the verification key,
+/// minus 1 (the first element is alpha_g1).
+pub fn public_input_count(vk: &VerifyingKey<Bn254>) -> usize {
+    if vk.gamma_abc_g1.is_empty() { 0 } else { vk.gamma_abc_g1.len() - 1 }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
