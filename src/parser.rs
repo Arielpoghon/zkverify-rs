@@ -118,6 +118,24 @@ pub(crate) fn parse_g1(coords: &[String]) -> Result<G1Affine, VerifyError> {
     Ok(G1Affine::new_unchecked(x, y))
 }
 
+/// Parse G1 coordinates without validation (advanced usage).
+///
+/// # Safety
+///
+/// Does not validate coordinate dimensions. Caller must ensure
+/// `coords` has exactly 3 elements.
+pub fn parse_g1_unchecked(coords: &[String]) -> Result<G1Affine, VerifyError> {
+    let x = parse_fq(&coords[0])?;
+    let y = parse_fq(&coords[1])?;
+    let z = parse_fq(&coords[2])?;
+
+    if z.is_zero() {
+        return Ok(G1Affine::identity());
+    }
+
+    Ok(G1Affine::new_unchecked(x, y))
+}
+
 /// Parse G2 affine coordinates [[x0,x1],[y0,y1],["1","0"]] to G2Affine
 pub(crate) fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, VerifyError> {
     if coords.len() != 3 {
