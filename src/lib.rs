@@ -71,3 +71,26 @@ pub fn verify_from_str(
     let public = parser::parse_public_json(public_json)?;
     verifier::verify_proof(&vk, &proof, &public)
 }
+
+/// Verify multiple proofs against the same verification key.
+///
+/// Returns `Ok(())` only if all proofs verify successfully.
+/// Returns `Err` with the index of the first failing proof.
+///
+/// # Errors
+///
+/// Returns [`VerifyError`] if any proof fails verification.
+pub fn verify_batch(
+    vk: &ark_groth16::VerifyingKey<ark_bn254::Bn254>,
+    proofs_and_inputs: &[(
+        ark_groth16::Proof<ark_bn254::Bn254>,
+        Vec<ark_bn254::Fr>,
+    )],
+) -> Result<(), VerifyError> {
+    for (i, (proof, public)) in proofs_and_inputs.iter().enumerate() {
+        verifier::verify_proof(vk, proof, public).map_err(|e| {
+            VerifyError::Other(format!("proof at index {} failed: {}", i, e))
+        })?;
+    }
+    Ok(())
+}
