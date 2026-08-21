@@ -67,6 +67,31 @@ let public = parser::load_public("public.json")?;
 verifier::verify_proof(&vkey, &proof, &public)?;
 ```
 
+Or use the convenience functions:
+
+```rust
+use zkverify_rs;
+
+// From files
+zkverify_rs::verify_from_files("vkey.json", "proof.json", "public.json")?;
+
+// From JSON strings
+zkverify_rs::verify_from_str(vkey_json, proof_json, public_json)?;
+
+// Batch verification
+zkverify_rs::verify_batch(&vkey, &[(proof1, inputs1), (proof2, inputs2)])?;
+```
+
+#### From Readers (streams, buffers, network)
+
+```rust
+use zkverify_rs::parser;
+
+let proof = parser::load_proof_from_reader(&mut cursor)?;
+let vkey = parser::load_vkey_from_reader(&mut cursor)?;
+let public = parser::load_public_from_reader(&mut cursor)?;
+```
+
 ## File Format
 
 ### Proof Format (snarkjs-compatible)
