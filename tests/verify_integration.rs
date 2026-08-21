@@ -122,3 +122,43 @@ fn test_verify_and_report_failure() {
 
     std::fs::remove_dir_all(&dir).unwrap();
 }
+
+#[test]
+fn test_verify_batch_all_valid() {
+    let vkey = parser::load_vkey("examples/vkey.json").unwrap();
+    let proof = parser::load_proof("examples/proof.json").unwrap();
+    let public = parser::load_public("examples/public.json").unwrap();
+
+    let proofs_and_inputs = vec![
+        (proof.clone(), public.clone()),
+        (proof.clone(), public.clone()),
+        (proof, public),
+    ];
+
+    let result = zkverify_rs::verify_batch(&vkey, &proofs_and_inputs);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_verify_batch_one_invalid() {
+    let vkey = parser::load_vkey("examples/vkey.json").unwrap();
+    let proof = parser::load_proof("examples/proof.json").unwrap();
+    let public = parser::load_public("examples/public.json").unwrap();
+
+    let dir = std::env::temp_dir().join("zkverify_batch_fail");
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("public.json");
+    std::fs::write(&path, r#"["1"]"#).unwrap();
+    let wrong_public = parser::load_public(path.to_str().unwrap()).unwrap();
+
+    let proofs_and_inputs = vec![
+        (proof.clone(), public),
+        (proof, wrong_public),
+    ];
+
+    let result = zkverify_rs::verify_batch(&vkey, &proofs_and_inputs);
+    assert!(result.is_err());
+    assert!(format!("{}", result.unwrap_err()).contains("index 1"));
+
+    std::fs::remove_dir_all(&dir).unwrap();
+}
