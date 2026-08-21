@@ -22,6 +22,7 @@ use crate::error::VerifyError;
 
 /// Represents a snarkjs-compatible proof JSON structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SnarkjsProof {
     pub pi_a: Vec<String>,
     pub pi_b: Vec<Vec<String>>,
