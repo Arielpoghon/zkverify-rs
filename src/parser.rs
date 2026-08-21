@@ -29,6 +29,13 @@ pub struct SnarkjsProof {
     pub curve: String,
 }
 
+impl SnarkjsProof {
+    /// Serialize the proof to a pretty-printed JSON string
+    pub fn to_json_string(&self) -> Result<String, VerifyError> {
+        serde_json::to_string_pretty(self).map_err(VerifyError::Json)
+    }
+}
+
 /// Represents a snarkjs-compatible verifying key JSON structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SnarkjsVKey {
@@ -41,6 +48,13 @@ pub struct SnarkjsVKey {
     pub vk_gamma_2: Vec<Vec<String>>,
     pub vk_delta_2: Vec<Vec<String>>,
     pub ic: Vec<Vec<String>>,
+}
+
+impl SnarkjsVKey {
+    /// Serialize the verifying key to a pretty-printed JSON string
+    pub fn to_json_string(&self) -> Result<String, VerifyError> {
+        serde_json::to_string_pretty(self).map_err(VerifyError::Json)
+    }
 }
 
 /// Parse a decimal string into a base field element Fq
