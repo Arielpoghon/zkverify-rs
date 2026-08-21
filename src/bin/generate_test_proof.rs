@@ -8,6 +8,7 @@ use ark_bn254::{Bn254, Fr};
 use ark_groth16::Groth16;
 use ark_relations::r1cs::{ConstraintSynthesizer, SynthesisError, LinearCombination};
 use ark_snark::SNARK;
+use clap::Parser;
 use rand::thread_rng;
 use std::fs;
 
@@ -20,6 +21,16 @@ struct MulCircuit {
     a: Option<Fr>,
     b: Option<Fr>,
     c: Option<Fr>,
+}
+
+/// CLI arguments for proof generation
+#[derive(Parser, Debug)]
+#[command(name = "generate_test_proof")]
+#[command(about = "Generate a test Groth16 proof for the a*b=c circuit")]
+struct Args {
+    /// Output directory for generated files (default: examples/)
+    #[arg(long, default_value = "examples")]
+    output_dir: String,
 }
 
 impl ConstraintSynthesizer<Fr> for MulCircuit {
@@ -50,6 +61,7 @@ impl ConstraintSynthesizer<Fr> for MulCircuit {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
     println!("Generating test Groth16 proof...");
 
     let rng = &mut thread_rng();
@@ -181,29 +193,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|p| p.to_string())
         .collect::<Vec<_>>();
 
-    // Create examples directory if it doesn't exist
-    fs::create_dir_all("examples")?;
+    // Create output directory if it doesn't exist
+    fs::create_dir_all(&args.output_dir)?;
 
     // Write files
     fs::write(
-        "examples/proof.json",
+        format!("{}/proof.json", args.output_dir),
         serde_json::to_string_pretty(&proof_json)?,
     )?;
 
     fs::write(
-        "examples/vkey.json",
+        format!("{}/vkey.json", args.output_dir),
         serde_json::to_string_pretty(&vkey_json)?,
     )?;
 
     fs::write(
-        "examples/public.json",
+        format!("{}/public.json", args.output_dir),
         serde_json::to_string_pretty(&public_json)?,
     )?;
 
     println!("✓ Proof files generated:");
-    println!("  - examples/proof.json");
-    println!("  - examples/vkey.json");
-    println!("  - examples/public.json");
+    println!("  - {}/proof.json", args.output_dir);
+    println!("  - {}/vkey.json", args.output_dir);
+    println!("  - {}/public.json", args.output_dir);
     println!("\nTest circuit: a * b = c, where a=3, b=5, c=15");
 
     Ok(())
