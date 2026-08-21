@@ -58,6 +58,7 @@ impl SnarkjsVKey {
 }
 
 /// Parse a decimal string into a base field element Fq
+#[inline]
 fn parse_fq(s: &str) -> Result<Fq, VerifyError> {
     Fq::from_str(s).map_err(|e| VerifyError::FieldParse {
         input: s.to_string(),
@@ -66,6 +67,7 @@ fn parse_fq(s: &str) -> Result<Fq, VerifyError> {
 }
 
 /// Parse a decimal string into a scalar field element Fr  
+#[inline]
 fn parse_fr(s: &str) -> Result<Fr, VerifyError> {
     Fr::from_str(s).map_err(|e| VerifyError::FieldParse {
         input: s.to_string(),

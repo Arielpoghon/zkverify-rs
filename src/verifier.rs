@@ -32,10 +32,12 @@ pub fn verify_proof(
 }
 
 /// Format output with ANSI color codes for terminal display
+#[inline]
 fn format_success(msg: &str) -> String {
     format!("\x1b[32m✓\x1b[0m {}", msg)
 }
 
+#[inline]
 fn format_error(msg: &str) -> String {
     format!("\x1b[31m✗\x1b[0m {}", msg)
 }
