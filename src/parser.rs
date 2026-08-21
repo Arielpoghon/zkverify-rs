@@ -13,6 +13,7 @@ use ark_bn254::{Fr, Fq, G1Affine, G2Affine, Bn254};
 use ark_groth16::{Proof, VerifyingKey};
 use ark_ff::Zero;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 use std::fs;
 use std::io::Read;
 use std::str::FromStr;
@@ -36,6 +37,16 @@ impl SnarkjsProof {
     }
 }
 
+impl fmt::Display for SnarkjsProof {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "SnarkjsProof(protocol={}, curve={}, pi_a=[..], pi_b=[..], pi_c=[..])",
+            self.protocol, self.curve
+        )
+    }
+}
+
 /// Represents a snarkjs-compatible verifying key JSON structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SnarkjsVKey {
@@ -54,6 +65,16 @@ impl SnarkjsVKey {
     /// Serialize the verifying key to a pretty-printed JSON string
     pub fn to_json_string(&self) -> Result<String, VerifyError> {
         serde_json::to_string_pretty(self).map_err(VerifyError::Json)
+    }
+}
+
+impl fmt::Display for SnarkjsVKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "SnarkjsVKey(protocol={}, curve={}, nPublic={})",
+            self.protocol, self.curve, self.n_public
+        )
     }
 }
 
