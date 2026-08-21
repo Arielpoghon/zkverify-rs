@@ -21,6 +21,9 @@ pub mod error;
 pub mod parser;
 pub mod verifier;
 
+/// Re-export of serde_json for downstream convenience
+pub use serde_json;
+
 use crate::error::VerifyError;
 
 /// Convenience function to verify a proof directly from file paths.
