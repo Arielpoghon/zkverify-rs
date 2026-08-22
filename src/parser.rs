@@ -517,6 +517,26 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_g2_unchecked_valid() {
+        let coords = vec![
+            vec!["1".to_string(), "2".to_string()],
+            vec!["3".to_string(), "4".to_string()],
+            vec!["1".to_string(), "0".to_string()],
+        ];
+        assert!(parse_g2_unchecked(&coords).is_ok());
+    }
+
+    #[test]
+    fn test_parse_g2_unchecked_infinity() {
+        let coords = vec![
+            vec!["0".to_string(), "0".to_string()],
+            vec!["0".to_string(), "0".to_string()],
+            vec!["0".to_string(), "0".to_string()],
+        ];
+        assert!(parse_g2_unchecked(&coords).is_ok());
+    }
+
+    #[test]
     fn test_parse_g2_valid() {
         let coords = vec![
             vec!["1".to_string(), "2".to_string()],
