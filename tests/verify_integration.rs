@@ -208,6 +208,14 @@ fn test_load_vkey_from_reader_invalid() {
 }
 
 #[test]
+fn test_load_public_from_reader_invalid() {
+    use std::io::Cursor;
+    let mut cursor = Cursor::new("[not, a, valid, number]");
+    let result = parser::load_public_from_reader(&mut cursor);
+    assert!(result.is_err());
+}
+
+#[test]
 fn test_verify_from_str_valid() {
     let vkey_json = std::fs::read_to_string("examples/vkey.json").unwrap();
     let proof_json = std::fs::read_to_string("examples/proof.json").unwrap();
