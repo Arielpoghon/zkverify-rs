@@ -123,6 +123,13 @@ mod tests {
             "FIELD_PARSE"
         );
         assert_eq!(VerifyError::Other("x".into()).code(), "OTHER");
+
+        let io_err = std::io::Error::new(std::io::ErrorKind::Other, "fail");
+        let err = VerifyError::IoRead {
+            path: "/test".into(),
+            source: io_err,
+        };
+        assert_eq!(err.code(), "IO_READ");
     }
 
     #[test]
