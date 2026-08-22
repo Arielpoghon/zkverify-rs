@@ -88,6 +88,15 @@ pub fn verify_from_str(
 ///
 /// Parses the verification key, proof, and public inputs from
 /// raw byte slices and verifies the proof.
+///
+/// # Example
+///
+/// ```no_run
+/// let vkey = std::fs::read("vkey.json").unwrap();
+/// let proof = std::fs::read("proof.json").unwrap();
+/// let public = std::fs::read("public.json").unwrap();
+/// zkverify_rs::verify_from_bytes(&vkey, &proof, &public).unwrap();
+/// ```
 pub fn verify_from_bytes(
     vkey_bytes: &[u8],
     proof_bytes: &[u8],
