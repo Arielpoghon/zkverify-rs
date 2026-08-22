@@ -445,6 +445,25 @@ mod tests {
     }
 
     #[test]
+    fn test_snarkjs_proof_display() {
+        let json = std::fs::read_to_string("examples/proof.json").unwrap();
+        let proof = parse_proof_json(&json).unwrap();
+        let display = format!("{}", proof);
+        assert!(display.contains("SnarkjsProof"));
+        assert!(display.contains("groth16"));
+        assert!(display.contains("bn254"));
+    }
+
+    #[test]
+    fn test_snarkjs_vkey_display() {
+        let json = std::fs::read_to_string("examples/vkey.json").unwrap();
+        let vkey = serde_json::from_str::<SnarkjsVKey>(&json).unwrap();
+        let display = format!("{}", vkey);
+        assert!(display.contains("SnarkjsVKey"));
+        assert!(display.contains("groth16"));
+    }
+
+    #[test]
     fn test_parse_g2_valid() {
         let coords = vec![
             vec!["1".to_string(), "2".to_string()],
