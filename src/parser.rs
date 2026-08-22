@@ -422,6 +422,19 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_g1_unchecked_valid() {
+        let coords = vec!["1".to_string(), "2".to_string(), "1".to_string()];
+        assert!(parse_g1_unchecked(&coords).is_ok());
+    }
+
+    #[test]
+    fn test_parse_g1_unchecked_infinity() {
+        let coords = vec!["0".to_string(), "0".to_string(), "0".to_string()];
+        let result = parse_g1_unchecked(&coords);
+        assert!(result.is_ok());
+    }
+
+    #[test]
     fn test_parse_g2_valid() {
         let coords = vec![
             vec!["1".to_string(), "2".to_string()],
