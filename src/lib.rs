@@ -24,6 +24,15 @@ pub mod verifier;
 /// Re-export of serde_json for downstream convenience
 pub use serde_json;
 
+/// Type alias for a Groth16 proof on BN254
+pub type Proof = ark_groth16::Proof<ark_bn254::Bn254>;
+
+/// Type alias for a Groth16 verification key on BN254
+pub type VerifyingKey = ark_groth16::VerifyingKey<ark_bn254::Bn254>;
+
+/// Type alias for a BN254 field element (Fr)
+pub type Fr = ark_bn254::Fr;
+
 use crate::error::VerifyError;
 
 /// Convenience function to verify a proof directly from file paths.
