@@ -216,6 +216,45 @@ fn test_load_public_from_reader_invalid() {
 }
 
 #[test]
+fn test_parse_proof_from_bytes_valid() {
+    let bytes = std::fs::read("examples/proof.json").unwrap();
+    let result = parser::parse_proof_from_bytes(&bytes);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_parse_vkey_from_bytes_valid() {
+    let bytes = std::fs::read("examples/vkey.json").unwrap();
+    let result = parser::parse_vkey_from_bytes(&bytes);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_parse_public_from_bytes_valid() {
+    let bytes = std::fs::read("examples/public.json").unwrap();
+    let result = parser::parse_public_from_bytes(&bytes);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_parse_proof_from_bytes_invalid() {
+    let result = parser::parse_proof_from_bytes(b"not json");
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_parse_vkey_from_bytes_invalid() {
+    let result = parser::parse_vkey_from_bytes(b"{bad}");
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_parse_public_from_bytes_invalid_utf8() {
+    let result = parser::parse_public_from_bytes(&[0xFF, 0xFE]);
+    assert!(result.is_err());
+}
+
+#[test]
 fn test_verify_from_str_valid() {
     let vkey_json = std::fs::read_to_string("examples/vkey.json").unwrap();
     let proof_json = std::fs::read_to_string("examples/proof.json").unwrap();
