@@ -42,6 +42,29 @@ pub enum VerifyError {
     Other(String),
 }
 
+impl VerifyError {
+    /// Get a short machine-readable error code for this error variant.
+    #[inline]
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::IoRead { .. } => "IO_READ",
+            Self::Json(_) => "JSON_PARSE",
+            Self::WrongProtocol(_) => "WRONG_PROTOCOL",
+            Self::WrongCurve(_) => "WRONG_CURVE",
+            Self::InvalidCoordinates(_) => "INVALID_COORDS",
+            Self::FieldParse { .. } => "FIELD_PARSE",
+            Self::InvalidProof => "INVALID_PROOF",
+            Self::Other(_) => "OTHER",
+        }
+    }
+
+    /// Check if this error is recoverable (e.g. file not found vs. corrupt data).
+    #[must_use]
+    pub fn is_recoverable(&self) -> bool {
+        matches!(self, Self::IoRead { .. })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -74,5 +97,42 @@ mod tests {
 
         assert!(std::error::Error::source(&err).is_some());
         assert!(format!("{}", err).contains("/tmp/test.json"));
+    }
+
+    #[test]
+    fn test_error_codes() {
+        assert_eq!(VerifyError::InvalidProof.code(), "INVALID_PROOF");
+        assert_eq!(
+            VerifyError::WrongProtocol("x".into()).code(),
+            "WRONG_PROTOCOL"
+        );
+        assert_eq!(
+            VerifyError::WrongCurve("x".into()).code(),
+            "WRONG_CURVE"
+        );
+        assert_eq!(
+            VerifyError::InvalidCoordinates("x".into()).code(),
+            "INVALID_COORDS"
+        );
+        assert_eq!(
+            VerifyError::FieldParse {
+                input: "x".into(),
+                reason: "y".into()
+            }
+            .code(),
+            "FIELD_PARSE"
+        );
+        assert_eq!(VerifyError::Other("x".into()).code(), "OTHER");
+    }
+
+    #[test]
+    fn test_is_recoverable() {
+        let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, "no");
+        let err = VerifyError::IoRead {
+            path: "/x".into(),
+            source: io_err,
+        };
+        assert!(err.is_recoverable());
+        assert!(!VerifyError::InvalidProof.is_recoverable());
     }
 }
