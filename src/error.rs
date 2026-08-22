@@ -135,4 +135,44 @@ mod tests {
         assert!(err.is_recoverable());
         assert!(!VerifyError::InvalidProof.is_recoverable());
     }
+
+    #[test]
+    fn test_json_error_source() {
+        let json_err = serde_json::from_str::<serde_json::Value>("not json").unwrap_err();
+        let err = VerifyError::Json(json_err);
+        assert!(std::error::Error::source(&err).is_some());
+    }
+
+    #[test]
+    fn test_wrong_protocol_no_source() {
+        let err = VerifyError::WrongProtocol("plonk".into());
+        assert!(std::error::Error::source(&err).is_none());
+    }
+
+    #[test]
+    fn test_wrong_curve_no_source() {
+        let err = VerifyError::WrongCurve("bls12381".into());
+        assert!(std::error::Error::source(&err).is_none());
+    }
+
+    #[test]
+    fn test_invalid_coordinates_no_source() {
+        let err = VerifyError::InvalidCoordinates("bad dims".into());
+        assert!(std::error::Error::source(&err).is_none());
+    }
+
+    #[test]
+    fn test_field_parse_no_source() {
+        let err = VerifyError::FieldParse {
+            input: "abc".into(),
+            reason: "not a number".into(),
+        };
+        assert!(std::error::Error::source(&err).is_none());
+    }
+
+    #[test]
+    fn test_other_no_source() {
+        let err = VerifyError::Other("something".into());
+        assert!(std::error::Error::source(&err).is_none());
+    }
 }
