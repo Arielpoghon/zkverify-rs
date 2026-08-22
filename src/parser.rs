@@ -260,6 +260,33 @@ pub fn load_public_from_reader<R: Read>(reader: &mut R) -> Result<Vec<Fr>, Verif
     parse_public_json(&content)
 }
 
+/// Parse a proof from a byte slice
+pub fn parse_proof_from_bytes(bytes: &[u8]) -> Result<Proof<Bn254>, VerifyError> {
+    let s = std::str::from_utf8(bytes).map_err(|e| VerifyError::IoRead {
+        path: "<bytes>".to_string(),
+        source: e,
+    })?;
+    parse_proof_json(s)
+}
+
+/// Parse a verifying key from a byte slice
+pub fn parse_vkey_from_bytes(bytes: &[u8]) -> Result<VerifyingKey<Bn254>, VerifyError> {
+    let s = std::str::from_utf8(bytes).map_err(|e| VerifyError::IoRead {
+        path: "<bytes>".to_string(),
+        source: e,
+    })?;
+    parse_vkey_json(s)
+}
+
+/// Parse public inputs from a byte slice
+pub fn parse_public_from_bytes(bytes: &[u8]) -> Result<Vec<Fr>, VerifyError> {
+    let s = std::str::from_utf8(bytes).map_err(|e| VerifyError::IoRead {
+        path: "<bytes>".to_string(),
+        source: e,
+    })?;
+    parse_public_json(s)
+}
+
 /// Load and parse a verifying key from a JSON file
 #[must_use = "the loaded verifying key should be used for verification"]
 pub fn load_vkey(path: &str) -> Result<VerifyingKey<Bn254>, VerifyError> {
