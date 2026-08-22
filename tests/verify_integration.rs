@@ -297,6 +297,20 @@ fn test_verify_from_bytes_invalid() {
 }
 
 #[test]
+fn test_verify_builder_default() {
+    use zkverify_rs::VerifyBuilder;
+
+    let builder = VerifyBuilder::default();
+    let result = builder
+        .vkey_path("examples/vkey.json")
+        .proof_path("examples/proof.json")
+        .public_path("examples/public.json")
+        .verify();
+
+    assert!(result.is_ok());
+}
+
+#[test]
 fn test_verify_builder_missing_all() {
     use zkverify_rs::VerifyBuilder;
 
