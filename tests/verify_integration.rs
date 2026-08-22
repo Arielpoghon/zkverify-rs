@@ -206,3 +206,19 @@ fn test_load_vkey_from_reader_invalid() {
     let result = parser::load_vkey_from_reader(&mut cursor);
     assert!(result.is_err());
 }
+
+#[test]
+fn test_verify_from_str_valid() {
+    let vkey_json = std::fs::read_to_string("examples/vkey.json").unwrap();
+    let proof_json = std::fs::read_to_string("examples/proof.json").unwrap();
+    let public_json = std::fs::read_to_string("examples/public.json").unwrap();
+
+    let result = zkverify_rs::verify_from_str(&vkey_json, &proof_json, &public_json);
+    assert!(result.is_ok(), "verify_from_str failed: {:?}", result.err());
+}
+
+#[test]
+fn test_verify_from_str_invalid_json() {
+    let result = zkverify_rs::verify_from_str("not json", "also not json", "[]");
+    assert!(result.is_err());
+}
