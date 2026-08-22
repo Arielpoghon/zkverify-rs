@@ -255,6 +255,41 @@ fn test_parse_public_from_bytes_invalid_utf8() {
 }
 
 #[test]
+fn test_verify_builder_full() {
+    use zkverify_rs::VerifyBuilder;
+
+    let result = VerifyBuilder::new()
+        .vkey_path("examples/vkey.json")
+        .proof_path("examples/proof.json")
+        .public_path("examples/public.json")
+        .verify();
+
+    assert!(result.is_ok(), "builder verify failed: {:?}", result.err());
+}
+
+#[test]
+fn test_verify_builder_missing_vkey() {
+    use zkverify_rs::VerifyBuilder;
+
+    let result = VerifyBuilder::new()
+        .proof_path("examples/proof.json")
+        .public_path("examples/public.json")
+        .verify();
+
+    assert!(result.is_err());
+    assert!(format!("{}", result.unwrap_err()).contains("vkey_path not set"));
+}
+
+#[test]
+fn test_verify_builder_missing_all() {
+    use zkverify_rs::VerifyBuilder;
+
+    let result = VerifyBuilder::new().verify();
+    assert!(result.is_err());
+    assert!(format!("{}", result.unwrap_err()).contains("vkey_path not set"));
+}
+
+#[test]
 fn test_verify_from_str_valid() {
     let vkey_json = std::fs::read_to_string("examples/vkey.json").unwrap();
     let proof_json = std::fs::read_to_string("examples/proof.json").unwrap();

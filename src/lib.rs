@@ -106,3 +106,80 @@ pub fn verify_batch(
     }
     Ok(())
 }
+
+/// Builder for configuring and running proof verification.
+///
+/// # Example
+///
+/// ```no_run
+/// use zkverify_rs::VerifyBuilder;
+///
+/// let result = VerifyBuilder::new()
+///     .vkey_path("vkey.json")
+///     .proof_path("proof.json")
+///     .public_path("public.json")
+///     .verify();
+/// ```
+pub struct VerifyBuilder {
+    vkey_path: Option<String>,
+    proof_path: Option<String>,
+    public_path: Option<String>,
+}
+
+impl VerifyBuilder {
+    /// Create a new empty builder
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            vkey_path: None,
+            proof_path: None,
+            public_path: None,
+        }
+    }
+
+    /// Set the verification key file path
+    #[must_use]
+    pub fn vkey_path(mut self, path: &str) -> Self {
+        self.vkey_path = Some(path.to_string());
+        self
+    }
+
+    /// Set the proof file path
+    #[must_use]
+    pub fn proof_path(mut self, path: &str) -> Self {
+        self.proof_path = Some(path.to_string());
+        self
+    }
+
+    /// Set the public inputs file path
+    #[must_use]
+    pub fn public_path(mut self, path: &str) -> Self {
+        self.public_path = Some(path.to_string());
+        self
+    }
+
+    /// Run verification with the configured paths
+    ///
+    /// # Errors
+    ///
+    /// Returns [`VerifyError`] if any path is missing, files cannot be read,
+    /// or the proof is invalid.
+    pub fn verify(self) -> Result<(), VerifyError> {
+        let vkey_path = self.vkey_path.ok_or_else(|| {
+            VerifyError::Other("vkey_path not set".to_string())
+        })?;
+        let proof_path = self.proof_path.ok_or_else(|| {
+            VerifyError::Other("proof_path not set".to_string())
+        })?;
+        let public_path = self.public_path.ok_or_else(|| {
+            VerifyError::Other("public_path not set".to_string())
+        })?;
+        verify_from_files(&vkey_path, &proof_path, &public_path)
+    }
+}
+
+impl Default for VerifyBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
