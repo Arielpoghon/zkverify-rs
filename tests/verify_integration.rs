@@ -281,6 +281,22 @@ fn test_verify_builder_missing_vkey() {
 }
 
 #[test]
+fn test_verify_from_bytes_valid() {
+    let vkey_bytes = std::fs::read("examples/vkey.json").unwrap();
+    let proof_bytes = std::fs::read("examples/proof.json").unwrap();
+    let public_bytes = std::fs::read("examples/public.json").unwrap();
+
+    let result = zkverify_rs::verify_from_bytes(&vkey_bytes, &proof_bytes, &public_bytes);
+    assert!(result.is_ok(), "verify_from_bytes failed: {:?}", result.err());
+}
+
+#[test]
+fn test_verify_from_bytes_invalid() {
+    let result = zkverify_rs::verify_from_bytes(b"not json", b"nope", b"[]");
+    assert!(result.is_err());
+}
+
+#[test]
 fn test_verify_builder_missing_all() {
     use zkverify_rs::VerifyBuilder;
 
