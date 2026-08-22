@@ -162,3 +162,47 @@ fn test_verify_batch_one_invalid() {
 
     std::fs::remove_dir_all(&dir).unwrap();
 }
+
+#[test]
+fn test_load_proof_from_reader() {
+    use std::io::Cursor;
+    let json = std::fs::read_to_string("examples/proof.json").unwrap();
+    let mut cursor = Cursor::new(json);
+    let result = parser::load_proof_from_reader(&mut cursor);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_load_vkey_from_reader() {
+    use std::io::Cursor;
+    let json = std::fs::read_to_string("examples/vkey.json").unwrap();
+    let mut cursor = Cursor::new(json);
+    let result = parser::load_vkey_from_reader(&mut cursor);
+    assert!(result.is_ok());
+}
+
+#[test]
+fn test_load_public_from_reader() {
+    use std::io::Cursor;
+    let json = std::fs::read_to_string("examples/public.json").unwrap();
+    let mut cursor = Cursor::new(json);
+    let result = parser::load_public_from_reader(&mut cursor);
+    assert!(result.is_ok());
+    assert_eq!(result.unwrap().len(), 1);
+}
+
+#[test]
+fn test_load_proof_from_reader_invalid() {
+    use std::io::Cursor;
+    let mut cursor = Cursor::new("not json at all");
+    let result = parser::load_proof_from_reader(&mut cursor);
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_load_vkey_from_reader_invalid() {
+    use std::io::Cursor;
+    let mut cursor = Cursor::new("{bad json");
+    let result = parser::load_vkey_from_reader(&mut cursor);
+    assert!(result.is_err());
+}
