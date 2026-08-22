@@ -36,6 +36,18 @@ impl SnarkjsProof {
     pub fn to_json_string(&self) -> Result<String, VerifyError> {
         serde_json::to_string_pretty(self).map_err(VerifyError::Json)
     }
+
+    /// Get the proof protocol identifier
+    #[inline]
+    pub fn protocol(&self) -> &str {
+        &self.protocol
+    }
+
+    /// Get the curve identifier
+    #[inline]
+    pub fn curve(&self) -> &str {
+        &self.curve
+    }
 }
 
 impl fmt::Display for SnarkjsProof {
@@ -66,6 +78,24 @@ impl SnarkjsVKey {
     /// Serialize the verifying key to a pretty-printed JSON string
     pub fn to_json_string(&self) -> Result<String, VerifyError> {
         serde_json::to_string_pretty(self).map_err(VerifyError::Json)
+    }
+
+    /// Get the verification key protocol identifier
+    #[inline]
+    pub fn protocol(&self) -> &str {
+        &self.protocol
+    }
+
+    /// Get the curve identifier
+    #[inline]
+    pub fn curve(&self) -> &str {
+        &self.curve
+    }
+
+    /// Get the number of public inputs
+    #[inline]
+    pub fn n_public(&self) -> u32 {
+        self.n_public
     }
 }
 
