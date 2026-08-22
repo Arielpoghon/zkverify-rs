@@ -554,6 +554,22 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_proof_wrong_curve() {
+        let json = r#"{"pi_a":["1","2","1"],"pi_b":[["3","4"],["5","6"],["1","0"]],"pi_c":["7","8","1"],"protocol":"groth16","curve":"bls12381"}"#;
+        let result = parse_proof_json(json);
+        assert!(result.is_err());
+        assert!(format!("{}", result.unwrap_err()).contains("bls12381"));
+    }
+
+    #[test]
+    fn test_parse_proof_wrong_protocol() {
+        let json = r#"{"pi_a":["1","2","1"],"pi_b":[["3","4"],["5","6"],["1","0"]],"pi_c":["7","8","1"],"protocol":"plonk","curve":"bn254"}"#;
+        let result = parse_proof_json(json);
+        assert!(result.is_err());
+        assert!(format!("{}", result.unwrap_err()).contains("plonk"));
+    }
+
+    #[test]
     fn test_parse_g2_valid() {
         let coords = vec![
             vec!["1".to_string(), "2".to_string()],
