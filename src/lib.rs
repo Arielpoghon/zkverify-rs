@@ -84,6 +84,21 @@ pub fn verify_from_str(
     verifier::verify_proof(&vk, &proof, &public)
 }
 
+/// Verify a proof directly from byte slices.
+///
+/// Parses the verification key, proof, and public inputs from
+/// raw byte slices and verifies the proof.
+pub fn verify_from_bytes(
+    vkey_bytes: &[u8],
+    proof_bytes: &[u8],
+    public_bytes: &[u8],
+) -> Result<(), VerifyError> {
+    let vk = parser::parse_vkey_from_bytes(vkey_bytes)?;
+    let proof = parser::parse_proof_from_bytes(proof_bytes)?;
+    let public = parser::parse_public_from_bytes(public_bytes)?;
+    verifier::verify_proof(&vk, &proof, &public)
+}
+
 /// Verify multiple proofs against the same verification key.
 ///
 /// Returns `Ok(())` only if all proofs verify successfully.
