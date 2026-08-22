@@ -233,6 +233,32 @@ done
 - Ensure public inputs match what the prover used
 - Check that the circuit specification hasn't changed
 
+## FAQ
+
+### Can I verify proofs from network streams?
+Yes, use the `from_reader` functions:
+```rust
+let proof = zkverify_rs::parser::load_proof_from_reader(&mut tcp_stream)?;
+```
+
+### Can I verify multiple proofs at once?
+Yes, use `verify_batch`:
+```rust
+zkverify_rs::verify_batch(&vkey, &[(proof1, inputs1), (proof2, inputs2)])?;
+```
+
+### Does this work with curves other than BN254?
+Currently only BN254 (bn128) is supported. Adding other curves would require changes to the parser and verifier.
+
+### How do I get the number of public inputs?
+Use `verifier::public_input_count(&vkey)` to get the count from a parsed verification key.
+
+### Can I parse from raw bytes instead of files?
+Yes, use the `parse_*_from_bytes` functions:
+```rust
+let proof = zkverify_rs::parser::parse_proof_from_bytes(&bytes)?;
+```
+
 ## License
 
 MIT
