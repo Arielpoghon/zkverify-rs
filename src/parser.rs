@@ -537,6 +537,23 @@ mod tests {
     }
 
     #[test]
+    fn test_snarkjs_proof_getters() {
+        let json = std::fs::read_to_string("examples/proof.json").unwrap();
+        let proof = parse_proof_json(&json).unwrap();
+        assert_eq!(proof.protocol(), "groth16");
+        assert_eq!(proof.curve(), "bn254");
+    }
+
+    #[test]
+    fn test_snarkjs_vkey_getters() {
+        let json = std::fs::read_to_string("examples/vkey.json").unwrap();
+        let vkey: SnarkjsVKey = serde_json::from_str(&json).unwrap();
+        assert_eq!(vkey.protocol(), "groth16");
+        assert_eq!(vkey.curve(), "bn254");
+        assert!(vkey.n_public() > 0);
+    }
+
+    #[test]
     fn test_parse_g2_valid() {
         let coords = vec![
             vec!["1".to_string(), "2".to_string()],
