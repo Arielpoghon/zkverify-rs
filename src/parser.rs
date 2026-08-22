@@ -205,6 +205,32 @@ pub(crate) fn parse_g2(coords: &[Vec<String>]) -> Result<G2Affine, VerifyError> 
     Ok(G2Affine::new_unchecked(x, y))
 }
 
+/// Parse G2 coordinates without dimension validation (advanced usage).
+///
+/// # Safety
+///
+/// Does not validate coordinate dimensions. Caller must ensure
+/// `coords` has exactly 3 elements, each with 2 sub-elements.
+pub fn parse_g2_unchecked(coords: &[Vec<String>]) -> Result<G2Affine, VerifyError> {
+    let x0 = parse_fq(&coords[0][0])?;
+    let x1 = parse_fq(&coords[0][1])?;
+    let x = ark_bn254::Fq2::new(x0, x1);
+
+    let y0 = parse_fq(&coords[1][0])?;
+    let y1 = parse_fq(&coords[1][1])?;
+    let y = ark_bn254::Fq2::new(y0, y1);
+
+    let z0 = parse_fq(&coords[2][0])?;
+    let z1 = parse_fq(&coords[2][1])?;
+    let z = ark_bn254::Fq2::new(z0, z1);
+
+    if z.is_zero() {
+        return Ok(G2Affine::identity());
+    }
+
+    Ok(G2Affine::new_unchecked(x, y))
+}
+
 /// Load and parse a proof from a JSON file
 #[must_use = "the loaded proof should be used for verification"]
 pub fn load_proof(path: &str) -> Result<Proof<Bn254>, VerifyError> {
