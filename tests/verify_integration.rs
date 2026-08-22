@@ -222,3 +222,10 @@ fn test_verify_from_str_invalid_json() {
     let result = zkverify_rs::verify_from_str("not json", "also not json", "[]");
     assert!(result.is_err());
 }
+
+#[test]
+fn test_public_input_count() {
+    let vkey = parser::load_vkey("examples/vkey.json").unwrap();
+    let count = verifier::public_input_count(&vkey);
+    assert_eq!(count, 1, "example proof has 1 public input");
+}
