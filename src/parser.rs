@@ -435,6 +435,16 @@ mod tests {
     }
 
     #[test]
+    fn test_proof_to_json_string_round_trip() {
+        let json = std::fs::read_to_string("examples/proof.json").unwrap();
+        let proof = parse_proof_json(&json).unwrap();
+        let output = proof.to_json_string().unwrap();
+        let reparsed: SnarkjsProof = serde_json::from_str(&output).unwrap();
+        assert_eq!(reparsed.protocol, proof.protocol);
+        assert_eq!(reparsed.curve, proof.curve);
+    }
+
+    #[test]
     fn test_parse_g2_valid() {
         let coords = vec![
             vec!["1".to_string(), "2".to_string()],
